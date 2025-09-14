@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html lang="pt-BR" data-bs-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Evento 1 - A Caça aos Bugs de Fronteira</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" xintegrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Roboto Mono', monospace;
+            background-color: #0a192f;
+            background-image:
+                radial-gradient(circle at 15% 50%, rgba(255, 193, 7, 0.1), transparent 30%),
+                radial-gradient(circle at 85% 30%, rgba(139, 92, 246, 0.1), transparent 30%);
+            min-height: 100vh;
+        }
+        .card {
+            background-color: rgba(17, 34, 64, 0.75);
+            border: 1px solid rgba(255, 193, 7, 0.2);
+            backdrop-filter: blur(10px);
+        }
+        .form-control, .form-select {
+            background-color: rgba(10, 25, 47, 0.8);
+            border-color: rgba(255, 193, 7, 0.3);
+        }
+        .form-control:focus, .form-select:focus {
+            background-color: rgba(10, 25, 47, 1);
+            border-color: #ffc107;
+            box-shadow: 0 0 0 0.25rem rgba(255, 193, 7, 0.25);
+        }
+        .btn-warning {
+            font-weight: bold;
+        }
+        .list-group-item {
+            background-color: rgba(10, 25, 47, 0.8);
+            border-color: rgba(255, 193, 7, 0.2);
+        }
+    </style>
+</head>
+<body class="p-3 p-md-4">
+
+    <div class="container-fluid">
+        <main class="card p-4 p-lg-5 mx-auto" style="max-width: 900px;">
+            <header class="text-center mb-5 position-relative">
+                <h1 class="display-5 fw-bold text-warning">🏆 Evento Cupom 🏆</h1>
+                <h2 class="h4 text-light">A Caça aos Bugs de Fronteira</h2>
+                <p class="text-muted">Crie um plano de teste e execute-o para encontrar todos os 5 bugs e validar os 2 caminhos felizes dentro do orçamento.</p>
+                <button id="help-btn" class="btn btn-sm btn-outline-light position-absolute top-0 end-0 mt-2 me-2 rounded-circle" style="width: 30px; height: 30px; line-height: 1;">?</button>
+            </header>
+
+            <div>
+                <!-- Seção de Planeamento -->
+                <div class="mb-5">
+                    <div class="row g-4">
+                        <div class="col-md-6">
+                            <div class="p-3 rounded h-100" style="background-color: rgba(10, 25, 47, 0.5);">
+                                <h3 class="fw-bold fs-5 text-light">Requisitos do Sistema:</h3>
+                                <ul class="list-unstyled text-muted ps-2 mt-2">
+                                    <li>- O <span class="fw-bold text-light">Código do Cupom</span> deve ser alfanumérico com 8 caracteres.</li>
+                                    <li>- O <span class="fw-bold text-light">Valor do Desconto</span> (%) deve ser um número entre 5 e 80.</li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <form id="add-test-form" class="p-3 rounded h-100" style="background-color: rgba(10, 25, 47, 0.5);">
+                                <h3 class="fw-bold fs-5 mb-3 text-light">Criar Novo Caso de Teste:</h3>
+                                <div class="row g-2">
+                                    <div class="col-6"><select id="test-path" class="form-select"></select></div>
+                                    <div class="col-6"><select id="test-field" class="form-select"></select></div>
+                                    <div class="col-12"><input type="text" id="test-value" class="form-control" placeholder="Valor a ser testado"></div>
+                                    <div class="col-12"><select id="test-expected" class="form-select"></select></div>
+                                </div>
+                                <button type="submit" class="btn btn-warning w-100 mt-3">Adicionar ao Plano</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Seção de Execução -->
+                <div>
+                    <div class="row g-3 text-center mb-4">
+                        <div class="col"><div class="card p-2 h-100"><div class="card-body"><h5 class="fs-1 fw-bold text-warning" id="budget">15</h5><small class="text-muted">Orçamento</small></div></div></div>
+                        <div class="col"><div class="card p-2 h-100"><div class="card-body"><h5 class="fs-1 fw-bold text-warning" id="happy-paths-count">0 / 2</h5><small class="text-muted">Caminhos Felizes</small></div></div></div>
+                        <div class="col"><div class="card p-2 h-100"><div class="card-body"><h5 class="fs-1 fw-bold text-warning" id="bugs-found-count">0 / 5</h5><small class="text-muted">Bugs</small></div></div></div>
+                        <div class="col"><div class="card p-2 h-100"><div class="card-body"><h5 class="fs-1 fw-bold text-warning" id="timer">00:00</h5><small class="text-muted">Tempo</small></div></div></div>
+                    </div>
+
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <h3 class="fw-bold fs-5 text-light">Plano de Investigação:</h3>
+                        <div class="btn-group">
+                            <button id="finish-test-btn" class="btn btn-sm btn-outline-danger">Finalizar</button>
+                            <button id="reveal-bugs-btn" class="btn btn-sm btn-outline-info">Dicas (-3)</button>
+                            <button id="execute-all-btn" class="btn btn-sm btn-outline-primary">Executar Todos</button>
+                        </div>
+                    </div>
+                    <div id="test-plan-list" class="list-group" style="max-height: 350px; overflow-y: auto;">
+                         <p class="text-center text-muted p-4">O seu plano de teste aparecerá aqui...</p>
+                    </div>
+
+                    <!-- Seção do Relatório -->
+                    <div id="report-section" class="d-none text-center mt-5">
+                        <div class="card p-4">
+                            <h3 class="text-light fs-4">Atividade Concluída!</h3>
+                            <p class="text-muted">Sua pontuação final foi de:</p>
+                            <p class="display-4 fw-bold text-success" id="final-score">0</p>
+                            <p class="text-muted">Gere um relatório em PDF com os seus resultados.</p>
+                            <button id="generate-pdf-btn" class="btn btn-lg btn-success mt-2">Gerar Relatório (PDF)</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+    
+    <!-- Toast Container -->
+    <div class="toast-container position-fixed bottom-0 end-0 p-3"></div>
+
+    <!-- Modals -->
+    <div class="modal fade" id="tipsModal" tabindex="-1"><div class="modal-dialog modal-dialog-centered"><div class="modal-content card"><div class="modal-header border-warning-subtle"><h5 class="modal-title text-warning">Dicas: Bugs Não Encontrados</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div><div class="modal-body"><ul id="modal-bug-list" class="list-unstyled"></ul></div></div></div></div>
+    <div class="modal fade" id="helpModal" tabindex="-1"><div class="modal-dialog modal-dialog-centered modal-lg"><div class="modal-content card"><div class="modal-header border-info-subtle"><h5 class="modal-title text-info">Como Jogar: A Caça aos Bugs</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div><div class="modal-body"><h5>🎯 Objetivo</h5><p>Seu objetivo é duplo: encontrar todos os <strong>5 bugs</strong> escondidos no sistema E validar os <strong>2 caminhos felizes</strong> (um para cada campo). Tudo isso antes que o seu <strong>orçamento</strong> de 15 pontos se esgote!</p><hr class="my-4"><h5>🕹️ Como Jogar</h5><ol><li><strong>Crie Casos de Teste:</strong> Use o formulário "Criar Novo Caso de Teste" para planejar sua investigação. Selecione o caminho (Feliz/Triste), o campo, o valor que quer testar e o que você espera que aconteça (Sucesso/Erro).</li><li><strong>Construa seu Plano:</strong> Cada teste criado aparecerá no seu "Plano de Investigação".</li><li><strong>Execute:</strong> Use o botão "Executar" em cada teste ou "Executar Todos" para ver os resultados. Você pode deletar testes não executados para refinar seu plano.</li></ol><hr class="my-4"><h5>💯 Pontuação Final (0-100)</h5><p>Sua nota final é calculada com base em 3 componentes:</p><ul><li><strong>Objetivos (até 70 pts):</strong> 10 pontos por bug encontrado (50) + 10 pontos por caminho feliz validado (20).</li><li><strong>Eficiência (até 25 pts):</strong> A pontuação máxima é obtida se você terminar com um orçamento de <strong>8</strong> (15 iniciais - 7 testes ideais). Quanto mais longe de 8 (para mais ou para menos), menor a pontuação. Requer no mínimo 7 testes executados.</li><li><strong>Velocidade (até 5 pts):</strong> Um bônus por terminar a atividade rapidamente.</li></ul><hr class="my-4"><h5>🏁 Condições de Fim de Jogo</h5><ul><li><strong>Vitória:</strong> Você ganha se encontrar todos os 5 bugs E validar os 2 caminhos felizes.</li><li><strong>Derrota:</strong> Você perde se o seu orçamento chegar a zero.</li><li>Você pode usar o botão "Finalizar" para encerrar a atividade a qualquer momento e gerar seu relatório.</li></ul></div></div></div></div>
+
+    <!-- Bibliotecas -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" xintegrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+    <script>
+        // --- ELEMENTOS DO DOM ---
+        const addTestForm = document.getElementById('add-test-form');
+        const testPlanList = document.getElementById('test-plan-list');
+        const budgetEl = document.getElementById('budget');
+        const bugsFoundCountEl = document.getElementById('bugs-found-count');
+        const happyPathsCountEl = document.getElementById('happy-paths-count');
+        const timerEl = document.getElementById('timer');
+        const toastContainer = document.querySelector('.toast-container');
+        const executeAllBtn = document.getElementById('execute-all-btn');
+        const revealBugsBtn = document.getElementById('reveal-bugs-btn');
+        const finishTestBtn = document.getElementById('finish-test-btn');
+        const modalBugList = document.getElementById('modal-bug-list');
+        const tipsModal = new bootstrap.Modal(document.getElementById('tipsModal'));
+        const reportSection = document.getElementById('report-section');
+        const generatePdfBtn = document.getElementById('generate-pdf-btn');
+        const helpBtn = document.getElementById('help-btn');
+        const helpModal = new bootstrap.Modal(document.getElementById('helpModal'));
+        const finalScoreEl = document.getElementById('final-score');
+
+        // --- ESTADO DO JOGO ---
+        let studentName = localStorage.getItem('studentName') || 'aluno';
+        let studentClass = localStorage.getItem('studentClass') || 'turma';
+        let budget = 15;
+        let testCases = [];
+        let testIdCounter = 1;
+        let happyPathsCompleted = 0;
+        const totalHappyPaths = 2;
+        let timerInterval;
+        let secondsPassed = 0;
+        let gameActive = false;
+
+        const happyPaths = {
+            'HP01': { description: 'Validar o campo Código do Cupom com um valor correto.', field: 'Código do Cupom', found: false },
+            'HP02': { description: 'Validar o campo Valor do Desconto com um valor correto.', field: 'Valor do Desconto', found: false }
+        };
+
+        const bugs = {
+            'BUG01': { description: 'O código precisa ter exatamente 8 caracteres.', found: false },
+            'BUG02': { description: 'O código não pode conter caracteres especiais.', found: false },
+            'BUG03': { description: 'O valor do desconto precisa ser um número.', found: false },
+            'BUG04': { description: 'O valor do desconto precisa ser >= 5.', found: false },
+            'BUG05': { description: 'O valor do desconto precisa ser <= 80.', found: false },
+        };
+        const totalBugs = Object.keys(bugs).length;
+
+        // --- FUNÇÕES DO JOGO ---
+        function startGameTimer() {
+            if (gameActive) return;
+            gameActive = true;
+            timerInterval = setInterval(() => {
+                secondsPassed++;
+                const minutes = Math.floor(secondsPassed / 60).toString().padStart(2, '0');
+                const seconds = (secondsPassed % 60).toString().padStart(2, '0');
+                timerEl.textContent = `${minutes}:${seconds}`;
+            }, 1000);
+        }
+
+        function populateSelect(elId, options) {
+            const select = document.getElementById(elId);
+            select.innerHTML = options.map(opt => `<option value="${opt.value}">${opt.text}</option>`).join('');
+        }
+        populateSelect('test-path', [{value: "Feliz", text: "Caminho Feliz"}, {value: "Triste", text: "Caminho Triste"}]);
+        populateSelect('test-field', [{value: "Código do Cupom", text: "Campo: Código"}, {value: "Valor do Desconto", text: "Campo: Desconto"}]);
+        populateSelect('test-expected', [{value: "Sucesso", text: "Espero: Sucesso"}, {value: "Erro", text: "Espero: Erro"}]);
+
+        addTestForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            startGameTimer();
+            const newTest = {
+                id: testIdCounter++,
+                path: document.getElementById('test-path').value,
+                field: document.getElementById('test-field').value,
+                value: document.getElementById('test-value').value,
+                expected: document.getElementById('test-expected').value,
+                executed: false,
+                result: null,
+            };
+            testCases.push(newTest);
+            renderTestPlan();
+            addTestForm.reset();
+        });
+
+        executeAllBtn.addEventListener('click', () => {
+            startGameTimer();
+            testCases.forEach((tc, index) => {
+                if (!tc.executed) executeTest(index);
+            });
+        });
+        
+        helpBtn.addEventListener('click', () => helpModal.show());
+
+        revealBugsBtn.addEventListener('click', () => {
+            startGameTimer();
+            if (budget >= 3) {
+                budget -= 3;
+                budgetEl.textContent = budget;
+                const unfoundBugs = Object.values(bugs).filter(b => !b.found).map(b => b.description);
+                modalBugList.innerHTML = unfoundBugs.length > 0
+                    ? unfoundBugs.map(desc => `<li class="mb-2 text-light">🐞 ${desc}</li>`).join('')
+                    : '<li class="text-success">Parabéns! Nenhum bug restante.</li>';
+                tipsModal.show();
+            } else {
+                showToast('Orçamento insuficiente para ver as dicas!', 'danger');
+            }
+        });
+        
+        finishTestBtn.addEventListener('click', () => {
+            showToast('FIM DE JOGO! Teste finalizado manualmente.', 'danger');
+            disableAllButtons();
+        });
+
+        function deleteTest(testId) {
+            testCases = testCases.filter(tc => tc.id !== testId);
+            renderTestPlan();
+        }
+
+        function renderTestPlan() {
+            if (testCases.length === 0) {
+                testPlanList.innerHTML = '<p class="text-center text-muted p-4">O seu plano de teste aparecerá aqui...</p>';
+                return;
+            }
+            testPlanList.innerHTML = '';
+            testCases.forEach((tc, index) => {
+                const testItem = document.createElement('div');
+                testItem.className = 'list-group-item d-flex justify-content-between align-items-center';
+                
+                let resultHTML = '';
+                if (tc.executed) {
+                    const { predictionCorrect, foundBugId, happyPathId } = tc.result;
+                    const predictionClass = predictionCorrect ? 'text-success' : 'text-danger';
+                    resultHTML = `<span class="${predictionClass} fw-bold">${predictionCorrect ? 'Previsão Correta!' : 'Previsão Incorreta!'}</span>`;
+                    
+                    if (foundBugId) resultHTML += `<br><small class="text-warning">Bug ${foundBugId}</small>`;
+                    else if (happyPathId) resultHTML += `<br><small class="text-warning">Caminho Feliz ${happyPathId}</small>`;
+                } else {
+                    resultHTML = `<div class="btn-group"><button data-id="${tc.id}" class="btn btn-sm btn-outline-danger delete-btn">🗑️</button><button data-index="${index}" class="btn btn-sm btn-outline-success execute-btn">Executar</button></div>`;
+                }
+                
+                testItem.innerHTML = `<div class="me-auto"><small class="fw-bold">CT-${String(tc.id).padStart(2, '0')}:</small><span class="text-light"> Testar <span class="fw-bold text-info">${tc.field}</span> com valor <span class="fw-bold text-info">'${tc.value}'</span></span>.<br><small class="text-muted">Espero: ${tc.expected}</small></div>${resultHTML}`;
+                testPlanList.appendChild(testItem);
+            });
+            attachEventListeners();
+        }
+
+        function attachEventListeners() {
+            document.querySelectorAll('.execute-btn').forEach(btn => btn.addEventListener('click', (e) => {
+                startGameTimer();
+                executeTest(parseInt(e.currentTarget.dataset.index));
+            }));
+            document.querySelectorAll('.delete-btn').forEach(btn => btn.addEventListener('click', (e) => deleteTest(parseInt(e.currentTarget.dataset.id))));
+        }
+
+        function executeTest(index) {
+            const tc = testCases[index];
+            if (tc.executed) return;
+
+            let actualResult = 'Sucesso', foundBugId = null;
+            if (tc.field === 'Código do Cupom') {
+                if (tc.value.length !== 8) { actualResult = 'Erro'; foundBugId = 'BUG01'; }
+                else if (/[^a-zA-Z0-9]/.test(tc.value)) { actualResult = 'Erro'; foundBugId = 'BUG02'; }
+            } else {
+                const numValue = parseFloat(tc.value);
+                if (isNaN(numValue) || !isFinite(tc.value) || tc.value.trim() === '') { actualResult = 'Erro'; foundBugId = 'BUG03'; }
+                else if (numValue < 5) { actualResult = 'Erro'; foundBugId = 'BUG04'; }
+                else if (numValue > 80) { actualResult = 'Erro'; foundBugId = 'BUG05'; }
+            }
+            
+            const predictionCorrect = tc.expected === actualResult;
+            const cost = predictionCorrect ? 1 : 2;
+            if (budget < cost) {
+                showToast(`Orçamento insuficiente! Custo de ${cost}.`, 'danger');
+                return;
+            }
+            budget -= cost;
+            budgetEl.textContent = budget;
+            if (!predictionCorrect) showToast('Previsão Incorreta! Custo de 2 pontos.', 'warning');
+            
+            tc.executed = true;
+            tc.result = { predictionCorrect, foundBugId, happyPathId: null };
+
+            if (tc.path === 'Feliz' && actualResult === 'Sucesso' && tc.expected === 'Sucesso') {
+                const happyPathEntry = Object.entries(happyPaths).find(([id, hp]) => hp.field === tc.field);
+                if (happyPathEntry) {
+                    const [hpId, hpData] = happyPathEntry;
+                    tc.result.happyPathId = hpId;
+                    if (!hpData.found) {
+                        hpData.found = true;
+                        happyPathsCompleted++;
+                        happyPathsCountEl.textContent = `${happyPathsCompleted} / ${totalHappyPaths}`;
+                    }
+                }
+            }
+
+            if (foundBugId && !bugs[foundBugId].found) {
+                bugs[foundBugId].found = true;
+                const bugsFoundCount = Object.values(bugs).filter(b => b.found).length;
+                bugsFoundCountEl.textContent = `${bugsFoundCount} / ${totalBugs}`;
+                showToast(`Novo Bug Encontrado: ${bugs[foundBugId].description}`);
+            }
+            
+            renderTestPlan();
+            checkGameEnd();
+        }
+        
+        function calculateFinalScore() {
+            const bugsFoundCount = Object.values(bugs).filter(b => b.found).length;
+            const bugsScore = bugsFoundCount * 10;
+            const happyPathScore = happyPathsCompleted * 10;
+            
+            let budgetScore = 0;
+            const idealBudget = 8; // 15 initial - 7 optimal tests
+            const maxDeviation = 8; // Furthest from 8 is 0
+            const deviation = Math.abs(budget - idealBudget);
+            budgetScore = (1 - (deviation / maxDeviation)) * 25;
+            budgetScore = Math.max(0, budgetScore); // Ensure score isn't negative
+
+            const minutes = secondsPassed / 60;
+            let timeScore = 0;
+            if (minutes < 10) timeScore = 5;
+            else if (minutes < 15) timeScore = 4;
+            else if (minutes < 20) timeScore = 3;
+            else if (minutes < 25) timeScore = 2;
+            else if (minutes < 30) timeScore = 1;
+
+            const totalScore = bugsScore + happyPathScore + budgetScore + timeScore;
+            return {
+                total: Math.round(totalScore > 100 ? 100 : totalScore),
+                bugs: bugsScore,
+                happyPaths: happyPathScore,
+                budget: budgetScore.toFixed(1),
+                time: timeScore,
+                executedTests: testCases.filter(tc => tc.executed).length
+            };
+        }
+
+        function checkGameEnd() {
+            const bugsFoundCount = Object.values(bugs).filter(b => b.found).length;
+            if ((bugsFoundCount === totalBugs && happyPathsCompleted >= totalHappyPaths) || budget <= 0) {
+                const message = (budget <= 0) ? 'FIM DE JOGO! Orçamento esgotado.' : 'VITÓRIA! Todos os objetivos concluídos!';
+                const type = (budget <= 0) ? 'danger' : 'success';
+                showToast(message, type);
+                disableAllButtons();
+            }
+        }
+
+        function disableAllButtons() {
+            clearInterval(timerInterval);
+            gameActive = false;
+            document.querySelectorAll('button').forEach(btn => {
+                if(btn.id !== 'generate-pdf-btn' && btn.id !== 'help-btn') btn.disabled = true;
+            });
+            const score = calculateFinalScore();
+            finalScoreEl.textContent = score.total;
+            reportSection.classList.remove('d-none');
+        }
+
+        function showToast(message, type = 'info') {
+            const toastEl = document.createElement('div');
+            const isDarkText = type === 'warning';
+            const textColor = isDarkText ? 'text-dark' : 'text-white';
+            let bgColor = 'bg-info';
+            if (type === 'success') bgColor = 'bg-success';
+            if (type === 'danger') bgColor = 'bg-danger';
+            if (type === 'warning') bgColor = 'bg-warning';
+            toastEl.className = `toast align-items-center ${textColor} ${bgColor} border-0`;
+            toastEl.innerHTML = `<div class="d-flex"><div class="toast-body">${message}</div><button type="button" class="btn-close ${isDarkText ? '' : 'btn-close-white'} me-2 m-auto" data-bs-dismiss="toast"></button></div>`;
+            toastContainer.appendChild(toastEl);
+            const toast = new bootstrap.Toast(toastEl);
+            toast.show();
+        }
+
+        generatePdfBtn.addEventListener('click', () => {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+            const score = calculateFinalScore();
+            
+            doc.setFont('helvetica', 'bold');
+            doc.setFontSize(18);
+            doc.text("Relatório de Testes - TSOF", 105, 20, { align: 'center' });
+            doc.setFontSize(14);
+            doc.text("Evento 1: A Caça aos Bugs de Fronteira", 105, 30, { align: 'center' });
+            doc.setFontSize(10);
+            doc.setFont('helvetica', 'normal');
+            doc.text(`Aluno(a): ${studentName}`, 14, 45);
+            doc.text(`Turma: ${studentClass}`, 14, 50);
+            doc.text(`Data: ${new Date().toLocaleDateString('pt-BR')}`, 14, 55);
+
+            doc.setFont('helvetica', 'bold');
+            doc.text("Requisitos do Sistema:", 14, 65);
+            doc.setFont('helvetica', 'normal');
+            doc.text("- O Código do Cupom deve ser alfanumérico com 8 caracteres.", 16, 70);
+            doc.text("- O Valor do Desconto (%) deve ser um número entre 5 e 80.", 16, 75);
+
+            const tableColumn = ["ID", "Caminho", "Campo", "Valor", "Esperado", "Obtido", "Status", "Objetivo"];
+            const tableRows = [];
+            testCases.filter(tc => tc.executed).forEach(tc => {
+                let objective = 'Verificação';
+                if (tc.result.foundBugId) objective = `Encontrar ${tc.result.foundBugId}`;
+                else if (tc.result.happyPathId) objective = `Validar ${tc.result.happyPathId}`;
+                tableRows.push([`CT-${String(tc.id).padStart(2, '0')}`, tc.path, tc.field, `'${tc.value}'`, tc.expected, tc.result.predictionCorrect ? tc.expected : (tc.expected === 'Sucesso' ? 'Erro' : 'Sucesso'), tc.result.predictionCorrect ? 'OK' : 'Falhou', objective]);
+            });
+
+            doc.autoTable({ head: [tableColumn], body: tableRows, startY: 80, theme: 'striped', headStyles: { fillColor: [17, 34, 64] } });
+            let finalY = doc.lastAutoTable.finalY || 150;
+
+            doc.setFont('helvetica', 'bold');
+            doc.text("Resultado Final e Pontuação:", 14, finalY + 15);
+            doc.setFont('helvetica', 'normal');
+            const bugsFoundCount = Object.values(bugs).filter(b => b.found).length;
+            doc.text(`- Bugs Encontrados: ${bugsFoundCount}/${totalBugs} (${score.bugs} / 50 pts)`, 16, finalY + 22);
+            doc.text(`- Caminhos Felizes: ${happyPathsCompleted}/${totalHappyPaths} (${score.happyPaths} / 20 pts)`, 16, finalY + 27);
+            let budgetText = `- Eficiência do Orçamento: ${budget}/15 restantes (${score.budget} / 25 pts)`;
+            budgetText += ` (ideal: 8)`;
+            doc.text(budgetText, 16, finalY + 32);
+            doc.text(`- Bónus de Tempo: ${timerEl.textContent} (${score.time} / 5 pts)`, 16, finalY + 37);
+
+            doc.setFont('helvetica', 'bold');
+            doc.setFontSize(16);
+            doc.text(`Pontuação Total: ${score.total} / 100`, 105, finalY + 50, { align: 'center' });
+            
+            const filename = `tsof_aula07_evento1_${studentName.toLowerCase().replace(/ /g, '_')}.pdf`;
+            doc.save(filename);
+        });
+        
+        renderTestPlan(); // Initial render
+    </script>
+</body>
+</html>
+

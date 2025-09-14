@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="pt-BR" data-bs-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Evento 2 - Análise de Risco: Tarefas</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" xintegrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Roboto Mono', monospace;
+            background-color: #0a192f;
+            background-image:
+                radial-gradient(circle at 15% 50%, rgba(13, 202, 240, 0.1), transparent 30%),
+                radial-gradient(circle at 85% 30%, rgba(139, 92, 246, 0.1), transparent 30%);
+            min-height: 100vh;
+        }
+        .card {
+            background-color: rgba(17, 34, 64, 0.75);
+            border: 1px solid rgba(13, 202, 240, 0.2);
+            backdrop-filter: blur(10px);
+        }
+        .form-select {
+            background-color: rgba(10, 25, 47, 0.8);
+            border-color: rgba(13, 202, 240, 0.3);
+            cursor: pointer;
+        }
+        .form-select:focus {
+            background-color: rgba(10, 25, 47, 1);
+            border-color: #0dcaf0;
+            box-shadow: 0 0 0 0.25rem rgba(13, 202, 240, 0.25);
+        }
+        .log-entry.log-fail {
+            border-left: 4px solid #ef4444;
+            background-color: rgba(239, 68, 68, 0.1);
+        }
+        .log-entry.log-success {
+            border-left: 4px solid #10b981;
+             background-color: rgba(16, 185, 129, 0.1);
+        }
+        .table-dark {
+            --bs-table-bg: rgba(10, 25, 47, 0.5);
+        }
+        .correct-guess { background-color: rgba(16, 185, 129, 0.5) !important; border-color: #10b981 !important; }
+        .incorrect-guess { background-color: rgba(239, 68, 68, 0.5) !important; border-color: #ef4444 !important; }
+
+    </style>
+</head>
+<body class="p-3 p-md-4">
+
+    <div class="container-fluid">
+        <main class="card p-4 p-lg-5 mx-auto" style="max-width: 1200px;">
+            <header class="text-center mb-5 position-relative">
+                <h1 class="display-5 fw-bold text-info">🏆 Análise de Risco: Tarefas 🏆</h1>
+                <h2 class="h4 text-light">Evento de Teste de Regressão</h2>
+                <p class="text-muted">Novas funcionalidades foram adicionadas. Analise o risco de regressão para cada funcionalidade antiga e encontre os bugs!</p>
+                <button id="help-btn" class="btn btn-sm btn-outline-light position-absolute top-0 end-0 mt-2 me-2 rounded-circle" style="width: 30px; height: 30px; line-height: 1;">?</button>
+            </header>
+
+            <div>
+                <!-- Seção de Análise de Risco -->
+                <div class="mb-5">
+                    <div class="mb-4 p-3 rounded" style="background-color: rgba(10, 25, 47, 0.5);">
+                        <h3 class="fw-bold fs-5 text-light">Relatório da Missão:</h3>
+                        <p class="text-muted mt-2">A equipa de desenvolvimento implementou as seguintes 5 novas funcionalidades. O seu trabalho é analisar o impacto de cada uma delas nas funcionalidades já existentes do sistema.</p>
+                        <ul class="list-group list-group-flush">
+                            <li class="list-group-item bg-transparent text-light"><strong>M1 (Data):</strong> Adicionada funcionalidade de "data de entrega". <em>Fique atento a como os dados antigos são preservados durante as modificações.</em></li>
+                            <li class="list-group-item bg-transparent text-light"><strong>M2 (Categoria):</strong> Implementado sistema de "categorias". <em>A classificação de uma tarefa pode impactar seu estado final.</em></li>
+                            <li class="list-group-item bg-transparent text-light"><strong>M3 (Responsável):</strong> Adicionado campo "responsável". <em>A posse de uma tarefa pode criar novas regras para seu ciclo de vida, inclusive para sua remoção.</em></li>
+                            <li class="list-group-item bg-transparent text-light"><strong>M4 (Histórico):</strong> Criado um log de "histórico de alterações". <em>Toda ação agora deixa um rastro, começando desde o nascimento da tarefa.</em></li>
+                            <li class="list-group-item bg-transparent text-light"><strong>M5 (Sub-tarefa):</strong> Implementada funcionalidade de "sub-tarefas". <em>A estrutura agora é mais complexa, o que pode afetar a forma como a lista completa é visualizada.</em></li>
+                        </ul>
+                    </div>
+
+                    <h3 class="fw-bold fs-5 mb-3 text-light">Matriz de Análise de Risco de Regressão:</h3>
+                    <p class="text-muted">Para cada funcionalidade antiga (linhas), atribua a probabilidade de defeito causada por cada nova mudança (colunas).</p>
+                    <div class="table-responsive">
+                        <table class="table table-dark table-bordered align-middle text-center w-100" style="table-layout: fixed;">
+                            <thead>
+                                <tr>
+                                    <th scope="col" style="width: 30%;">Funcionalidade Antiga</th>
+                                    <th scope="col" style="width: 14%;">M1 (Data)</th>
+                                    <th scope="col" style="width: 14%;">M2 (Categoria)</th>
+                                    <th scope="col" style="width: 14%;">M3 (Responsável)</th>
+                                    <th scope="col" style="width: 14%;">M4 (Histórico)</th>
+                                    <th scope="col" style="width: 14%;">M5 (Sub-tarefa)</th>
+                                </tr>
+                            </thead>
+                            <tbody id="risk-matrix-body">
+                                <!-- Linhas serão geradas pelo JS -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Seção de Objetivos -->
+                <div class="mb-5">
+                    <h3 class="fw-bold fs-5 text-light">Objetivos da Análise:</h3>
+                    <div class="row g-3 text-center mt-2">
+                        <div class="col"><div class="card p-2 h-100"><div class="card-body"><h5 class="fs-2 fw-bold text-danger" id="alta-count">0 / 11</h5><small class="text-muted">Riscos ALTA</small></div></div></div>
+                        <div class="col"><div class="card p-2 h-100"><div class="card-body"><h5 class="fs-2 fw-bold text-warning" id="media-count">0 / 14</h5><small class="text-muted">Riscos MÉDIA</small></div></div></div>
+                        <div class="col"><div class="card p-2 h-100"><div class="card-body"><h5 class="fs-2 fw-bold text-success" id="baixa-count">0 / 10</h5><small class="text-muted">Riscos BAIXA</small></div></div></div>
+                        <div class="col"><div class="card p-2 h-100"><div class="card-body"><h5 class="fs-2 fw-bold text-secondary" id="nenhuma-count">0 / 5</h5><small class="text-muted">Riscos NENHUMA</small></div></div></div>
+                    </div>
+                </div>
+
+                <!-- Seção de Resultados -->
+                <div class="row justify-content-center">
+                    <div class="col-lg-8">
+                        <h3 class="fw-bold fs-5 text-light">Painel do Detetive:</h3>
+                        <div class="d-grid gap-3 mb-4">
+                            <button id="analyze-button" class="btn btn-info btn-lg">Analisar Riscos e Encontrar os Bugs</button>
+                        </div>
+                        
+                        <h3 class="fw-bold fs-5 text-light">Log de Investigação:</h3>
+                        <div id="log" class="p-3 rounded" style="background-color: rgba(10, 25, 47, 0.5); min-height: 200px;">
+                            <p class="text-center text-muted">Aguardando análise...</p>
+                        </div>
+
+                        <div id="report-section" class="d-none text-center mt-4">
+                           <div class="card p-4">
+                                <h3 class="text-light fs-4">Atividade Concluída!</h3>
+                                <p class="text-muted">Sua pontuação final foi de:</p>
+                                <p class="display-4 fw-bold text-info" id="final-score">0</p>
+                                <p class="text-muted">Gere um relatório em PDF com os seus resultados.</p>
+                                <button id="generate-pdf-btn" class="btn btn-lg btn-success mt-2">Gerar Relatório (PDF)</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Modal para Ajuda -->
+    <div class="modal fade" id="helpModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-content card">
+                <div class="modal-header border-info-subtle">
+                    <h5 class="modal-title text-info">Como Jogar: Análise de Risco</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <h5>🎯 Objetivo</h5>
+                    <p>Seu objetivo é agir como um testador experiente. Analise o impacto de cada <strong>nova funcionalidade (M1 a M5)</strong> sobre cada <strong>funcionalidade antiga (F1 a F8)</strong> e preencha a matriz com a sua avaliação de risco de regressão (a probabilidade da mudança ter quebrado algo).</p>
+                    <hr class="my-4">
+                    <h5>🕹️ Como Jogar</h5>
+                    <ol>
+                        <li><strong>Analise as Pistas:</strong> Leia o "Relatório da Missão" com atenção. Cada nova funcionalidade tem uma pista sobre o seu comportamento.</li>
+                        <li><strong>Preencha a Matriz:</strong> Para cada célula, escolha o nível de risco que você acredita que a nova funcionalidade (coluna) representa para a funcionalidade antiga (linha).</li>
+                        <li><strong>Analise os Resultados:</strong> Quando terminar, clique no botão "Analisar Riscos". O sistema irá corrigir a sua matriz e calcular a sua pontuação.</li>
+                    </ol>
+                    <hr class="my-4">
+                    <h5>💯 Pontuação Final (0-100)</h5>
+                    <p>Sua nota final é calculada com base em dois componentes:</p>
+                    <ul>
+                        <li><strong>Análise de Precisão (até 50 pts):</strong> Você ganha pontos por cada célula da matriz que preencher corretamente.</li>
+                        <li><strong>Identificação dos Bugs Principais (até 50 pts):</strong> Existem <strong>5 bugs principais</strong> escondidos, correspondendo a 5 riscos de nível "ALTO". Você ganha <strong>10 pontos de bônus</strong> por cada um que identificar corretamente.</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bibliotecas -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" xintegrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+    <script>
+        // --- CONFIGURAÇÃO DO JOGO ---
+        const oldFeatures = [
+            { id: 'F1', name: 'Criar Tarefa' }, { id: 'F2', name: 'Listar Todas as Tarefas' },
+            { id: 'F3', name: 'Buscar Tarefa por ID' }, { id: 'F4', name: 'Editar Descrição da Tarefa' },
+            { id: 'F5', name: 'Marcar Tarefa como Concluída' }, { id: 'F6', name: 'Listar Tarefas Concluídas' },
+            { id: 'F7', name: 'Deletar Tarefa' }, { id: 'F8', name: 'Deletar Tarefas Concluídas' },
+        ];
+        const newFeatures = ['M1', 'M2', 'M3', 'M4', 'M5'];
+        const riskLevels = ['NENHUMA', 'BAIXA', 'MÉDIA', 'ALTA'];
+        const riskAnswerKey = {
+            'F1': { 'M1': 'MÉDIA', 'M2': 'MÉDIA', 'M3': 'MÉDIA', 'M4': 'ALTA', 'M5': 'ALTA' },
+            'F2': { 'M1': 'MÉDIA', 'M2': 'MÉDIA', 'M3': 'MÉDIA', 'M4': 'NENHUMA', 'M5': 'ALTA' },
+            'F3': { 'M1': 'MÉDIA', 'M2': 'MÉDIA', 'M3': 'MÉDIA', 'M4': 'NENHUMA', 'M5': 'MÉDIA' },
+            'F4': { 'M1': 'ALTA', 'M2': 'MÉDIA', 'M3': 'MÉDIA', 'M4': 'MÉDIA', 'M5': 'BAIXA' },
+            'F5': { 'M1': 'MÉDIA', 'M2': 'ALTA', 'M3': 'BAIXA', 'M4': 'MÉDIA', 'M5': 'BAIXA' },
+            'F6': { 'M1': 'BAIXA', 'M2': 'ALTA', 'M3': 'BAIXA', 'M4': 'NENHUMA', 'M5': 'BAIXA' },
+            'F7': { 'M1': 'BAIXA', 'M2': 'BAIXA', 'M3': 'ALTA', 'M4': 'MÉDIA', 'M5': 'ALTA' },
+            'F8': { 'M1': 'BAIXA', 'M2': 'BAIXA', 'M3': 'ALTA', 'M4': 'MÉDIA', 'M5': 'BAIXA' },
+        };
+        const principalBugs = [
+            { oldF: 'F1', newF: 'M4', description: 'M4 (Histórico) vs "Criar Tarefa".' },
+            { oldF: 'F2', newF: 'M5', description: 'M5 (Sub-tarefa) vs "Listar Todas as Tarefas".' },
+            { oldF: 'F4', newF: 'M1', description: 'M1 (Data) vs "Editar Descrição da Tarefa".' },
+            { oldF: 'F5', newF: 'M2', description: 'M2 (Categoria) vs "Marcar Tarefa como Concluída".' },
+            { oldF: 'F7', newF: 'M3', description: 'M3 (Responsável) vs "Deletar Tarefa".' },
+        ];
+        const totalRisks = { 'ALTA': 11, 'MÉDIA': 14, 'BAIXA': 10, 'NENHUMA': 5 };
+
+        // --- ELEMENTOS DO DOM ---
+        const riskMatrixBody = document.getElementById('risk-matrix-body');
+        const analyzeButton = document.getElementById('analyze-button');
+        const finalScoreEl = document.getElementById('final-score');
+        const logEl = document.getElementById('log');
+        const helpBtn = document.getElementById('help-btn');
+        const helpModal = new bootstrap.Modal(document.getElementById('helpModal'));
+        const reportSection = document.getElementById('report-section');
+        const generatePdfBtn = document.getElementById('generate-pdf-btn');
+        const counters = {
+            'ALTA': document.getElementById('alta-count'),
+            'MÉDIA': document.getElementById('media-count'),
+            'BAIXA': document.getElementById('baixa-count'),
+            'NENHUMA': document.getElementById('nenhuma-count')
+        };
+        
+        // --- LÓGICA DO JOGO ---
+        function createRiskMatrix() {
+            oldFeatures.forEach(oldFeature => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `<th scope="row" class="text-light">${oldFeature.name}</th>`;
+                newFeatures.forEach(newFeatureId => {
+                    const td = document.createElement('td');
+                    const select = document.createElement('select');
+                    select.className = 'form-select form-select-sm';
+                    select.dataset.old = oldFeature.id;
+                    select.dataset.new = newFeatureId;
+                    select.innerHTML = '<option value="" selected disabled>Selecione...</option>' + riskLevels.map(level => `<option value="${level}">${level}</option>`).join('');
+                    td.appendChild(select);
+                    tr.appendChild(td);
+                });
+                riskMatrixBody.appendChild(tr);
+            });
+        }
+        
+        analyzeButton.addEventListener('click', () => {
+            let totalPoints = 0;
+            const maxPoints = 40;
+            let correctBugIdentifications = 0;
+            const correctCounts = { 'ALTA': 0, 'MÉDIA': 0, 'BAIXA': 0, 'NENHUMA': 0 };
+
+            logEl.innerHTML = '';
+
+            document.querySelectorAll('#risk-matrix-body select').forEach(select => {
+                const oldF_id = select.dataset.old;
+                const newF_id = select.dataset.new;
+                const userAnswer = select.value;
+                const correctAnswer = riskAnswerKey[oldF_id][newF_id];
+
+                select.disabled = true;
+                if (!userAnswer) return;
+
+                if (userAnswer === correctAnswer) {
+                    totalPoints++;
+                    select.classList.add('correct-guess');
+                    correctCounts[correctAnswer]++;
+                } else {
+                    select.classList.add('incorrect-guess');
+                }
+            });
+            
+            principalBugs.forEach(bug => {
+                const select = document.querySelector(`select[data-old='${bug.oldF}'][data-new='${bug.newF}']`);
+                if (select && select.value === 'ALTA') {
+                    correctBugIdentifications++;
+                    registrarLog(`<strong class="text-success">BUG PRINCIPAL ENCONTRADO!</strong> Risco ALTO identificado para: ${bug.description}`, 'success');
+                } else {
+                    registrarLog(`<strong class="text-danger">BUG PRINCIPAL PERDIDO!</strong> Falha ao identificar o risco ALTO para: ${bug.description}`, 'fail');
+                }
+            });
+
+            const analysisScore = (totalPoints / maxPoints) * 50;
+            const bugBonus = correctBugIdentifications * 10;
+            const finalScore = Math.round(analysisScore + bugBonus);
+
+            finalScoreEl.textContent = finalScore;
+            analyzeButton.disabled = true;
+
+            Object.keys(counters).forEach(key => {
+                counters[key].textContent = `${correctCounts[key]} / ${totalRisks[key]}`;
+            });
+
+            registrarLog(`<strong class="text-info">Análise Concluída!</strong> Pontuação de precisão: ${Math.round(analysisScore)}/50. Bónus por bugs: ${bugBonus}/50.`);
+            
+            reportSection.classList.remove('d-none');
+        });
+        
+        helpBtn.addEventListener('click', () => helpModal.show());
+        
+        function registrarLog(mensagem, tipo = 'info') {
+            if (logEl.innerHTML.includes('Aguardando')) logEl.innerHTML = '';
+            const entry = document.createElement('div');
+            entry.className = `log-entry p-2 mb-2 rounded`;
+            if (tipo === 'success') entry.classList.add('log-success');
+            if (tipo === 'fail') entry.classList.add('log-fail');
+            entry.innerHTML = `<small class="text-muted">${new Date().toLocaleTimeString()}</small><br>${mensagem}`;
+            logEl.prepend(entry);
+        }
+
+        generatePdfBtn.addEventListener('click', () => {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF('landscape');
+            const studentName = localStorage.getItem('studentName') || 'aluno';
+            const studentClass = localStorage.getItem('studentClass') || 'turma';
+
+            doc.setFont('helvetica', 'bold');
+            doc.setFontSize(18);
+            doc.text("Relatório de Análise de Risco - TSOF", 148.5, 15, { align: 'center' });
+            doc.setFontSize(14);
+            doc.text("Evento 2: Análise de Risco: Tarefas", 148.5, 25, { align: 'center' });
+            doc.setFontSize(10);
+            doc.setFont('helvetica', 'normal');
+            doc.text(`Aluno(a): ${studentName}`, 14, 35);
+            doc.text(`Turma: ${studentClass}`, 14, 40);
+            doc.text(`Data: ${new Date().toLocaleDateString('pt-BR')}`, 14, 45);
+
+            const score = {
+                analysis: Math.round((document.querySelectorAll('.correct-guess').length / 40) * 50),
+                bonus: principalBugs.filter(bug => document.querySelector(`select[data-old='${bug.oldF}'][data-new='${bug.newF}']`)?.value === 'ALTA').length * 10,
+            };
+            score.total = score.analysis + score.bonus;
+
+            doc.setFont('helvetica', 'bold');
+            doc.setFontSize(16);
+            doc.text(`Pontuação Total: ${score.total} / 100`, 280, 35, { align: 'right' });
+            
+            doc.setFontSize(11);
+            doc.text("Matriz de Análise de Risco Preenchida:", 14, 60);
+
+            const tableHead = [['Funcionalidade Antiga', 'M1', 'M2', 'M3', 'M4', 'M5']];
+            const tableBody = [];
+
+            oldFeatures.forEach(oldF => {
+                const rowData = [oldF.name];
+                newFeatures.forEach(newF => {
+                    const select = document.querySelector(`select[data-old='${oldF.id}'][data-new='${newF}']`);
+                    rowData.push(select ? select.value : '');
+                });
+                tableBody.push(rowData);
+            });
+
+            doc.autoTable({
+                head: tableHead,
+                body: tableBody,
+                startY: 65,
+                theme: 'striped',
+                headStyles: { fillColor: [17, 34, 64], textColor: 255 },
+                styles: { textColor: 0, font: 'helvetica', halign: 'center' },
+                columnStyles: { 0: { halign: 'left' } },
+                didDrawCell: function(data) {
+                    if (data.section === 'body' && data.column.index > 0) {
+                        const select = document.querySelector(`select[data-old='${oldFeatures[data.row.index].id}'][data-new='${newFeatures[data.column.index - 1]}']`);
+                        if (select && select.value) {
+                            if (select.classList.contains('correct-guess')) {
+                                doc.setFillColor(16, 185, 129); 
+                            } else {
+                                doc.setFillColor(239, 68, 68);
+                            }
+                            doc.rect(data.cell.x, data.cell.y, data.cell.width, data.cell.height, 'F');
+                        }
+                    }
+                }
+            });
+
+            let finalY = doc.lastAutoTable.finalY;
+
+            doc.setFont('helvetica', 'bold');
+            doc.setFontSize(11);
+            doc.text("Resumo da Pontuação:", 14, finalY + 10);
+            doc.setFont('helvetica', 'normal');
+            doc.setFontSize(10);
+            doc.text(`- Precisão da Matriz: ${score.analysis} / 50 pts`, 16, finalY + 17);
+            doc.text(`- Bugs Principais Identificados: ${score.bonus / 10}/${principalBugs.length} (${score.bonus} / 50 pts)`, 16, finalY + 22);
+
+            const filename = `tsof_aula07_evento2_${studentName.toLowerCase().replace(/ /g, '_')}.pdf`;
+            doc.save(filename);
+        });
+
+        // Inicialização
+        createRiskMatrix();
+    </script>
+</body>
+</html>
+
